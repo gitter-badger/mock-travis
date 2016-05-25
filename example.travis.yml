@@ -1,0 +1,59 @@
+#! -------------------------------------------------------------------------
+#! Mock-Travis Settings
+#! -------------------------------------------------------------------------
+
+mock_travis:
+  # Set docker image which will be utilized.
+  docker_image: fedora
+
+  # Set a particular test configuration for mock.
+  mock_config: fedora-23-x86_64
+
+  # Set the packages to be tested.
+  # Packages directory.
+  # For example
+  #         If the PACKAGE spec file is stored like this
+  #         ├───GitHub Repository
+  #         │   └───rpm
+  #         │       └───build
+  #         │           └───PACKAGE
+  #         │               └───PACKAGE.spec
+  #         The directory should be set to `./rpm/build` or `rpm/build`.
+  #
+  #         If the PACKAGE spec file is stored like this
+  #         ├───GitHub Repository
+  #         │   └───PACKAGE
+  #         │       └───PACKAGE.spec
+  #         The directory should be set to `./` or leave it empty.
+  packages_directory: ./
+  # Target packages.
+  # It is allowed to set multiple package name in one line.
+  packages_name: 
+  # Build requires of target package.
+  # It is allowed to set multiple package name in one line.
+  # Set here will force script to ignore the `git` below.
+  packages_buildrequires: 
+  # Use RPM spec files from a GitHub repository
+  # instead of storing in local.
+  # It only works if the `buildrequires` above is empty.
+  # Otherwise, script will use `buildrequires` and ignore the `git`.
+  # For example
+  #         If your spec repository is 
+  #         "https://github.com/nrechn/Sway-Fedora",
+  #         git could be set to `nrechn/Sway-Fedora`
+  packages_buildrequires_git: 
+
+
+
+#! -------------------------------------------------------------------------
+#! DO NOT EDIT THE FOLLOWING SETTINGS
+#! UNLESS YOU KNOW WHAT YOU ARE DOING
+#! -------------------------------------------------------------------------
+
+sudo: required
+
+services:
+  - docker
+
+script:
+  - bash -c "$(wget -q https://raw.githubusercontent.com/nrechn/mock-travis/master/build.sh -O -)"
