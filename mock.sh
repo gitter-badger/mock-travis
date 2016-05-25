@@ -1,5 +1,24 @@
 #!/bin/bash
 
+function add_extra_repo()
+{
+        if [ -n "${yml_mock_travis_packages_extra_repo}" ]
+        then {
+                color_printlin cyan "Adding ${yml_mock_travis_packages_extra_repo} as extra repository"
+                sed -i '$ d' /etc/mock/${yml_mock_travis_mock_config}.cfg
+                add_mock_config "[extra-local]"
+                add_mock_config "name=extra-local"
+                add_mock_config "baseurl=${yml_mock_travis_packages_extra_repo}"
+                add_mock_config "gpgcheck=0"
+                add_mock_config "\"\"\""
+                check_status "Adding extra repository succeeded" "Adding extra repository failed"
+        } else {
+                color_printlin cyan "Extra repository is not set"
+                color_printlin green "No extra repository will be used on building packages"
+        }
+        fi
+}
+
 function add_local_repo()
 {
         sed -i '$ d' /etc/mock/${yml_mock_travis_mock_config}.cfg
@@ -19,8 +38,10 @@ function build_buildrequires()
 {
         if [ -n "${yml_mock_travis_packages_buildrequires}" ]
         then {
+                clean_dnf_cache
                 build_for_local ${yml_mock_travis_packages_buildrequires}
         } else {
+                clean_dnf_cache
                 build_for_git
         }
         fi
@@ -44,9 +65,7 @@ function build_for_local()
 
 function build_target_pkg()
 {
-        color_printlin cyan "Start cleaning dnf package manager cache"
-        /usr/bin/mock -r ${yml_mock_travis_mock_config} --dnf-cmd clean all > /dev/null 2>&1
-        check_status "Clean dnf package manager cache succeeded" "Clean dnf package manager cache failed"
+        clean_dnf_cache
         build_for_local ${yml_mock_travis_packages_name}
 }
 
@@ -60,6 +79,13 @@ function check_status()
 	        echo -e "\e[32m\e[1m$1.\e[0m"
 	}
 	fi
+}
+
+function clean_dnf_cache()
+{
+        color_printlin cyan "Start cleaning dnf package manager cache"
+        /usr/bin/mock -r ${yml_mock_travis_mock_config} --dnf-cmd clean all > /dev/null 2>&1
+        check_status "Clean dnf package manager cache succeeded" "Clean dnf package manager cache failed"
 }
 
 function color_printlin()
@@ -169,6 +195,7 @@ function main()
 {
         read_yml
         setup_mock_env
+        add_extra_repo
         build_buildrequires
         set_local_repo
         add_local_repo

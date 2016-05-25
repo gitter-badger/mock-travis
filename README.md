@@ -58,6 +58,15 @@ mock_travis:
   #         "https://github.com/nrechn/Sway-Fedora",
   #         git could be set to `nrechn/Sway-Fedora`
   packages_buildrequires_git: 
+  # Use extra/external repository during building packages.
+  # This option allows mock to access an additional repository
+  # plus defaults repositories based on the mock config.
+  # gpgcheck is disabled in this option.
+  # For example
+  #         If add FZUG as an extra repository
+  #         packages_extra_repo should set to
+  #         "https://repo.fdzh.org/FZUG/testing/24/x86_64/"
+  packages_extra_repo:
 
 
 
