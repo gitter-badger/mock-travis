@@ -90,9 +90,20 @@ When you make a push to your GitHub repository, it will trigger a [Travis CI](ht
 - Build target source packages.
 - Build target binary packages.
 
-The [Travis CI](https://travis-ci.org/) will show the whole build log. The results of each step can be found easily in build log as they will be shown in colored bold words.
+<br>
+### Advantages
+- No need to test mock build on your own computer. It is quite hard to run mock if you use other GNU/Linux distros than RedHat related GNU/Linux distros.
+- Colorful output. The [Travis CI](https://travis-ci.org/) will show the whole build log. The results of each step can be found easily in build log as they will be shown in colored bold words.
 
+Here is an example of build log:
+![Travis-CI log](https://github.com/nrechn/mock-travis/raw/master/misc/travis-ci-log.png)
+
+> Click the picture to view the raw file.
+
+<br>
+### Projects use Mock-Travis
 [nrechn/Sway-Fedora](https://github.com/nrechn/Sway-Fedora) is a real world example of utilizing Mock-Travis. You can check its [.travis.yml](https://github.com/nrechn/Sway-Fedora/blob/master/.travis.yml) file, or [Travis CI build log](https://travis-ci.org/nrechn/Sway-Fedora).
+
 
 <br>
 ### Limitations
