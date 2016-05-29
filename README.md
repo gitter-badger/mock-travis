@@ -1,4 +1,7 @@
 # Mock-Travis
+
+[![Build Status](http://img.shields.io/travis/nrechn/mock-travis.svg?style=flat-square)](https://travis-ci.org/nrechn/mock-travis)
+
 Mock-Travis utilizes [Travis CI](https://travis-ci.org/) to provide a continuous integration practice for testing **`spec`** files of RedHat RPM packages. That is to say, Mock-Travis can be utilized to build source rpm packages and binary rpm packages in order to check whether **`spec`** files are written correctly.
 
 > **Note**: RPM package **spec** files need to be stored in the GitHub repository.
