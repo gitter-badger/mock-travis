@@ -65,4 +65,6 @@ services:
   - docker
 
 script:
-  - bash -c "$(wget -q https://raw.githubusercontent.com/nrechn/mock-travis/master/build.sh -O -)"
+  - wget -q https://github.com/nrechn/mock-travis/releases/download/latest/mock-travis 
+        && chmod +x mock-travis 
+        && ./mock-travis

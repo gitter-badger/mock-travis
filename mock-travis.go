@@ -1,8 +1,8 @@
 package main
 
 import (
+	"fmt"
 	"github.com/codeskyblue/go-sh"
-	"github.com/fatih/color"
 	"github.com/spf13/viper"
 	"os"
 	"path/filepath"
@@ -16,29 +16,19 @@ var (
 func boldColor(colorOption, msg string) {
 	switch colorOption {
 	case "red":
-		red := color.New(color.FgRed)
-		boldRed := red.Add(color.Bold)
-		boldRed.Println("\n" + msg)
+		_ = sh.Command("echo", "-e", `\n\e[31m\e[1m`+msg+`...\e[0m`).Run()
 
 	case "green":
-		green := color.New(color.FgGreen)
-		boldGreen := green.Add(color.Bold)
-		boldGreen.Println("\n" + msg)
+		_ = sh.Command("echo", "-e", `\n\e[32m\e[1m`+msg+`...\e[0m`).Run()
 
 	case "yellow":
-		yellow := color.New(color.FgYellow)
-		boldYellow := yellow.Add(color.Bold)
-		boldYellow.Println("\n" + msg)
+		_ = sh.Command("echo", "-e", `\n\e[33m\e[1m`+msg+`...\e[0m`).Run()
 
 	case "cyan":
-		cyan := color.New(color.FgCyan)
-		boldCyan := cyan.Add(color.Bold)
-		boldCyan.Println("\n" + msg)
+		_ = sh.Command("echo", "-e", `\n\e[36m\e[1m`+msg+`...\e[0m`).Run()
 
 	default:
-		white := color.New(color.FgWhite)
-		boldWhite := white.Add(color.Bold)
-		boldWhite.Println("\n" + msg)
+		fmt.Println("\n" + msg)
 	}
 }
 

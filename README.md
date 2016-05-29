@@ -84,7 +84,9 @@ services:
   - docker
 
 script:
-  - bash -c "$(wget -q https://raw.githubusercontent.com/nrechn/mock-travis/master/build.sh -O -)"
+  - wget -q https://github.com/nrechn/mock-travis/releases/download/latest/mock-travis 
+        && chmod +x mock-travis 
+        && ./mock-travis
 ```
 
 You can simply copy and paste the example above, or download the [example.travis.yml](https://raw.githubusercontent.com/nrechn/mock-travis/master/example.travis.yml).
