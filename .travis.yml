@@ -14,8 +14,8 @@ install:
   - go get github.com/spf13/viper
 
 script:
-  - go test -v ./test/...
-  - go build
+  - cp -r src test && cp .travis.yml test/ && mv test/mock-travis.go test/mock-travis_test.go && go test -v ./test/...
+  - cd src && go build
 
 deploy:
   provider: releases
