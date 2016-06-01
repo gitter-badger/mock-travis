@@ -22,40 +22,11 @@ Setting up Mock-Travis is quite simple. All you need to do are just two things:
 #! -------------------------------------------------------------------------
 
 mock_travis:
-  # Set docker image which will be utilized.
-  docker_image: fedora
-
   # Set a particular test configuration for mock.
-  mock_config: fedora-23-x86_64
+  mock_config: fedora-24-x86_64
 
-  # Set the packages to be tested.
-  # Packages directory.
-  # For example
-  #         If the PACKAGE spec file is stored like this
-  #         ├───GitHub Repository
-  #         │   └───rpm
-  #         │       └───build
-  #         │           └───PACKAGE
-  #         │               └───PACKAGE.spec
-  #         The directory should be set to `./rpm/build` or `rpm/build`.
-  #
-  #         If the PACKAGE spec file is stored like this
-  #         ├───GitHub Repository
-  #         │   └───PACKAGE
-  #         │       └───PACKAGE.spec
-  #         The directory should be set to `./` or leave it empty.
-  packages_directory: ./
-  # Target packages.
-  # It is allowed to set multiple package name in one line.
-  packages_name: 
-  # Build requires of target package.
-  # It is allowed to set multiple package name in one line.
-  # Set here will force script to ignore the `git` below.
-  packages_buildrequires: 
   # Use RPM spec files from a GitHub repository
-  # instead of storing in local.
-  # It only works if the `buildrequires` above is empty.
-  # Otherwise, script will use `buildrequires` and ignore the `git`.
+  # to generate extra part of buildrequires packages.
   # For example
   #         If your spec repository is 
   #         "https://github.com/nrechn/Sway-Fedora",
@@ -70,7 +41,6 @@ mock_travis:
   #         packages_extra_repo should set to
   #         "https://repo.fdzh.org/FZUG/testing/24/x86_64/"
   packages_extra_repo:
-
 
 
 #! -------------------------------------------------------------------------
@@ -96,18 +66,17 @@ You can simply copy and paste the example above, or download the [example.travis
 <br>
 ### How Mock-Travis works?
 When you make a push to your GitHub repository, it will trigger a [Travis CI](https://travis-ci.org/) build. The build process will run a docker container and do the following things:
-- Install necessary tools. (e.g. `mock`, `spectool`, etc.)
 - Initialize mock config.
-- Build dependencies source packages.
-- Build dependencies binary packages.
+- Build source packages.
+- Build binary packages, and record packages build failed.
 - Create local repository and add it to the mock config.
-- Build target source packages.
-- Build target binary packages.
+- Rebuild binary packages based on the failed records.
 
 <br>
 ### Advantages
 - No need to test mock build on your own computer. It is quite hard to run mock if you use other GNU/Linux distros than RedHat related GNU/Linux distros.
-- Colorful output. The [Travis CI](https://travis-ci.org/) will show the whole build log. The results of each step can be found easily in build log as they will be shown in colored bold words.
+- No need to worry about build requires. Mock-travis gives build faild packages another try with local repository which contains packages just built. It should be sufficient to solve the missing buildrequires issue.
+- Beautiful output. Mock-travis generates colorful bold information to exhibit the build process and status. The [Travis CI](https://travis-ci.org/) will show the whole build log. The results of each step can be found easily in build log as they will be shown in colored bold words.
 
 Here is an example of build log:
 ![Travis-CI log](https://github.com/nrechn/mock-travis/raw/master/misc/travis-ci-log.png)
@@ -123,3 +92,11 @@ Here is an example of build log:
 ### Limitations
 - The customizability is still low. Only provide a few options currently.
 - Run `mock` in docker container to test packages is few minutes slower than test locally.
+
+<br>
+### ToDo
+- Basically, it is to make mock-travis more customizable and run faster.
+
+<br>
+### Contributing
+- If you have any suggestion, idea, or bug report; feel free to open an issue on this repository.

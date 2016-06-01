@@ -1,36 +1,27 @@
+// Copyright © 2016 nrechn <nrechn@gmail.com>
+//
+// This file is part of mock-travis.
+//
+// mock-travis is free software: you can redistribute it and/or modify
+// it under the terms of the GNU Lesser General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// mock-travis is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with mock-travis. If not, see <http://www.gnu.org/licenses/>.
+//
+
 package main
 
 import (
-	"fmt"
 	"github.com/codeskyblue/go-sh"
-	"github.com/spf13/viper"
 	"os"
-	"path/filepath"
 )
-
-var (
-	dockerName  string = "mock-build"
-	dockerImage string = "nrechn/fedora-mock"
-)
-
-func boldColor(colorOption, msg string) {
-	switch colorOption {
-	case "red":
-		_ = sh.Command("echo", "-e", `\n\e[31m\e[1m`+msg+`...\e[0m`).Run()
-
-	case "green":
-		_ = sh.Command("echo", "-e", `\n\e[32m\e[1m`+msg+`...\e[0m`).Run()
-
-	case "yellow":
-		_ = sh.Command("echo", "-e", `\n\e[33m\e[1m`+msg+`...\e[0m`).Run()
-
-	case "cyan":
-		_ = sh.Command("echo", "-e", `\n\e[36m\e[1m`+msg+`...\e[0m`).Run()
-
-	default:
-		fmt.Println("\n" + msg)
-	}
-}
 
 func cleanDocker(name string) {
 	var (
@@ -45,24 +36,6 @@ func cleanDocker(name string) {
 		os.Exit(1)
 	}
 	boldColor("green", "Clean docker container succeeded.")
-}
-
-func currentLocation() string {
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		panic(err)
-	}
-	return dir
-}
-
-func gyml(arg string) string {
-	viper.SetConfigName(".travis")
-	viper.AddConfigPath(".")
-	err := viper.ReadInConfig()
-	if err != nil {
-		panic(err)
-	}
-	return viper.GetString(arg)
 }
 
 func pullDocker() {
@@ -85,7 +58,7 @@ func runDocker(name string) {
 		err            error
 		volumeLocation string
 	)
-	volumeLocation = currentLocation() + "/:/home"
+	volumeLocation = currentLocation() + "/:" + shareDir
 	if err = sh.Command("docker",
 		"run",
 		"--name",
@@ -96,7 +69,7 @@ func runDocker(name string) {
 		volumeLocation,
 		"-i",
 		dockerImage,
-		"/bin/fedora-mock").Run(); err != nil {
+		shareDir+"/mock-travis").Run(); err != nil {
 		boldColor("red",
 			"OVERALL: Fail to build "+
 				gyml("mock_travis.packages_name")+
@@ -109,8 +82,17 @@ func runDocker(name string) {
 			" and related build dependencies.")
 }
 
-func main() {
+func initDoc() {
 	pullDocker()
 	runDocker(dockerName)
 	cleanDocker(dockerName)
+}
+
+func main() {
+	if checkDocCon() {
+		mockBuild()
+	} else {
+		initDoc()
+	}
+
 }
