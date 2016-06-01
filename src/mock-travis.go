@@ -69,7 +69,6 @@ func runDocker(name string) {
 		volumeLocation,
 		"-i",
 		dockerImage,
-		//		"/bin/fedora-mock").Run(); err != nil {
 		shareDir+"/mock-travis").Run(); err != nil {
 		boldColor("red",
 			"OVERALL: Fail to build "+

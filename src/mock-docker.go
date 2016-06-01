@@ -94,7 +94,7 @@ func MockBuildSRPM(filePath string, f os.FileInfo, err error) error {
 			boldColor("red", "Fail to download "+f.Name()+" source file")
 			os.Exit(1)
 		}
-		boldColor("green", "Download source succeeded.")
+		boldColor("green", "Download "+f.Name()+" source succeeded.")
 		boldColor("cyan", "Start building "+f.Name()+" SRPM")
 		outBuild, errBuild = sh.Command("/usr/bin/mock",
 			"-r",
@@ -108,9 +108,9 @@ func MockBuildSRPM(filePath string, f os.FileInfo, err error) error {
 			specFile).Output()
 		outBuild = outBuild[:0]
 		if errBuild != nil {
-			boldColor("red", "Build "+f.Name()+" failed")
+			boldColor("red", "Build "+f.Name()+" SRPM failed")
 		}
-		boldColor("green", "Build "+f.Name()+" succeeded.")
+		boldColor("green", "Build "+f.Name()+" SRPM succeeded.")
 	}
 	return nil
 }
@@ -135,8 +135,9 @@ func MockBuildRPM(filePath string, f os.FileInfo, err error) error {
 		if err != nil {
 			boldColor("red", "Build "+f.Name()+" failed")
 			rebuildList = append(rebuildList, srpmFile)
+		} else {
+			boldColor("green", "Build "+f.Name()+" succeeded.")
 		}
-		boldColor("green", "Build "+f.Name()+" succeeded.")
 	}
 	return nil
 }
@@ -151,7 +152,7 @@ func allBuild() {
 	_ = filepath.Walk(srpmDir, MockBuildRPM)
 	updateRepo()
 	addRepo(localRepo)
-	boldColor("cyan", "Start rebuilding for the binary RPMs built failed.")
+	boldColor("yellow", "Start rebuilding for the binary RPMs built failed.")
 	rebuildRPM()
 	if len(stillFail) != 0 {
 		boldColor("red", "Still build failed packages:")
@@ -169,9 +170,7 @@ func rebuildRPM() {
 	)
 	for i := 0; i < cap(rebuildList); i++ {
 		fileFullName := path.Base(rebuildList[i])
-		fileExt := filepath.Ext(rebuildList[i])
-		fileName := fileFullName[0 : len(fileFullName)-len(fileExt)]
-		boldColor("cyan", "Start rebuild "+fileName)
+		boldColor("cyan", "Start rebuild "+fileFullName)
 		out, err = sh.Command("/usr/bin/mock",
 			"-r",
 			gyml("mock_travis.mock_config"),
@@ -182,39 +181,21 @@ func rebuildRPM() {
 		).Output()
 		out = out[:0]
 		if err != nil {
-			boldColor("red", "Rebuild "+fileName+" failed")
-			stillFail = append(stillFail, fileName)
+			boldColor("red", "Rebuild "+fileFullName+" failed")
+			stillFail = append(stillFail, fileFullName)
 		}
-		boldColor("green", "Rebuild "+fileName+" succeeded.")
+		boldColor("green", "Rebuild "+fileFullName+" succeeded.")
 	}
 }
 
-// for test
-func createRepo() {
+func updateRepo() {
 	var (
 		out []byte
 		err error
 	)
-	boldColor("cyan", "install createrepo")
-	out, err = sh.Command("dnf", "-y", "install", "createrepo").Output()
-	out = out[:0]
-	if err != nil {
-		boldColor("red", "install createrepo failed")
-		os.Exit(1)
-	}
-	boldColor("green", "install createrepo succeeded")
-}
-
-func updateRepo() {
-	createRepo()
-	//	var (
-	//		out []byte
-	//		err error
-	//	)
 	boldColor("cyan", "Start updating local repository")
-	//	out, err = sh.Command("createrepo", tmpDir+"/"+"RPM").Output()
-	//	out = out[:0]
-	err := sh.Command("createrepo", tmpDir+"/"+"RPM").Run()
+	out, err = sh.Command("createrepo", tmpDir+"/"+"RPM").Output()
+	out = out[:0]
 	if err != nil {
 		boldColor("red", "Update local repository failed")
 		os.Exit(1)
