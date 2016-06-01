@@ -20,7 +20,7 @@ script:
 deploy:
   provider: releases
   api_key: $GITHUBKEY
-  file: src/mock-travis
+  file: mock-travis
   skip_cleanup: true
   overwrite: true
   on:
