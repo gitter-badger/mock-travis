@@ -208,7 +208,6 @@ func initMock() {
 		out []byte
 		err error
 	)
-	// deltarpm=0
 	boldColor("cyan", "Start setting up mock environment")
 	out, err = sh.Command("/usr/bin/mock",
 		"-r",

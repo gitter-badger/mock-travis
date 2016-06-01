@@ -15,12 +15,12 @@ install:
 
 script:
   - cp -r src test && cp .travis.yml test/ && mv test/mock-travis.go test/mock-travis_test.go && go test -v ./test/...
-  - cd src && go build
+  - cd src && go build mock-travis.go mock-docker.go common.go
 
 deploy:
   provider: releases
   api_key: $GITHUBKEY
-  file: mock-travis
+  file: src/mock-travis
   skip_cleanup: true
   overwrite: true
   on:

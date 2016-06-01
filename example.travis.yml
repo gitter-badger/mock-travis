@@ -4,12 +4,10 @@
 
 mock_travis:
   # Set a particular test configuration for mock.
-  mock_config: fedora-23-x86_64
+  mock_config: fedora-24-x86_64
 
   # Use RPM spec files from a GitHub repository
-  # instead of storing in local.
-  # It only works if the `buildrequires` above is empty.
-  # Otherwise, script will use `buildrequires` and ignore the `git`.
+  # to generate extra part of buildrequires packages.
   # For example
   #         If your spec repository is 
   #         "https://github.com/nrechn/Sway-Fedora",
