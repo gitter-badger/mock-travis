@@ -84,9 +84,8 @@ func boldColor(colorOption, msg string) {
 func checkDocCon() bool {
 	if _, err := os.Stat("/.dockerinit"); err == nil {
 		return true
-	} else {
-		return false
 	}
+	return false
 }
 
 func currentLocation() string {

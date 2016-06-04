@@ -64,14 +64,12 @@ func setTmpDir() {
 
 func setGit() {
 	var (
-		out []byte
 		err error
 	)
 	gitUrl := "https://github.com/" + gyml("mock_travis.packages_buildrequires_git")
 	boldColor("cyan", "Start setting git repository")
 	_, _ = sh.Command("dnf", "-y", "install", "git").Output()
-	out, err = sh.Command("git", "clone", gitUrl, tmpDir+"/"+"SPEC/GIT").Output()
-	out = out[:0]
+	_, err = sh.Command("git", "clone", gitUrl, tmpDir+"/"+"SPEC/GIT").Output()
 	if err != nil {
 		boldColor("red", "Setting git repository failed.")
 		os.Exit(1)
@@ -79,24 +77,22 @@ func setGit() {
 	boldColor("green", "Setting git repository succeeded.")
 }
 
-func MockBuildSRPM(filePath string, f os.FileInfo, err error) error {
+func mockBuildSRPM(filePath string, f os.FileInfo, err error) error {
 	var (
-		outDown, outBuild []byte
 		errDown, errBuild error
 	)
 	if filepath.Ext(f.Name()) == ".spec" {
 		specDir := path.Dir(filePath)
 		specFile := specDir + "/" + f.Name()
 		boldColor("cyan", "Start downloading "+f.Name()+" source files")
-		outDown, errDown = sh.Command("spectool", "-g", specFile, "-C", tmpDir+"/"+"source").Output()
-		outDown = outDown[:0]
+		_, errDown = sh.Command("spectool", "-g", specFile, "-C", tmpDir+"/"+"source").Output()
 		if errDown != nil {
 			boldColor("red", "Fail to download "+f.Name()+" source file")
 			os.Exit(1)
 		}
 		boldColor("green", "Download "+f.Name()+" source succeeded.")
 		boldColor("cyan", "Start building "+f.Name()+" SRPM")
-		outBuild, errBuild = sh.Command("/usr/bin/mock",
+		_, errBuild = sh.Command("/usr/bin/mock",
 			"-r",
 			gyml("mock_travis.mock_config"),
 			"--resultdir",
@@ -106,7 +102,6 @@ func MockBuildSRPM(filePath string, f os.FileInfo, err error) error {
 			tmpDir+"/"+"source",
 			"--spec",
 			specFile).Output()
-		outBuild = outBuild[:0]
 		if errBuild != nil {
 			boldColor("red", "Build "+f.Name()+" SRPM failed")
 		}
@@ -115,15 +110,13 @@ func MockBuildSRPM(filePath string, f os.FileInfo, err error) error {
 	return nil
 }
 
-func MockBuildRPM(filePath string, f os.FileInfo, err error) error {
-	var (
-		out []byte
-	)
+func mockBuildRPM(filePath string, f os.FileInfo, err error) error {
+
 	if filepath.Ext(f.Name()) == ".rpm" {
 		srpmDir := path.Dir(filePath)
 		srpmFile := srpmDir + "/" + f.Name()
 		boldColor("cyan", "Start building "+f.Name()+" binary RPM")
-		out, err = sh.Command("/usr/bin/mock",
+		_, err = sh.Command("/usr/bin/mock",
 			"-r",
 			gyml("mock_travis.mock_config"),
 			"--resultdir",
@@ -131,7 +124,6 @@ func MockBuildRPM(filePath string, f os.FileInfo, err error) error {
 			"--rebuild",
 			srpmFile,
 		).Output()
-		out = out[:0]
 		if err != nil {
 			boldColor("red", "Build "+f.Name()+" failed")
 			rebuildList = append(rebuildList, srpmFile)
@@ -148,8 +140,8 @@ func allBuild() {
 	}
 	specDir := tmpDir + "/" + "SPEC"
 	srpmDir := tmpDir + "/" + "SRPM"
-	_ = filepath.Walk(specDir, MockBuildSRPM)
-	_ = filepath.Walk(srpmDir, MockBuildRPM)
+	_ = filepath.Walk(specDir, mockBuildSRPM)
+	_ = filepath.Walk(srpmDir, mockBuildRPM)
 	updateRepo()
 	addRepo(localRepo)
 	boldColor("yellow", "Start rebuilding for the binary RPMs built failed.")
@@ -165,13 +157,12 @@ func allBuild() {
 
 func rebuildRPM() {
 	var (
-		out []byte
 		err error
 	)
 	for i := 0; i < cap(rebuildList); i++ {
 		fileFullName := path.Base(rebuildList[i])
 		boldColor("cyan", "Start rebuild "+fileFullName)
-		out, err = sh.Command("/usr/bin/mock",
+		_, err = sh.Command("/usr/bin/mock",
 			"-r",
 			gyml("mock_travis.mock_config"),
 			"--resultdir",
@@ -179,7 +170,6 @@ func rebuildRPM() {
 			"--rebuild",
 			rebuildList[i],
 		).Output()
-		out = out[:0]
 		if err != nil {
 			boldColor("red", "Rebuild "+fileFullName+" failed")
 			stillFail = append(stillFail, fileFullName)
@@ -190,12 +180,10 @@ func rebuildRPM() {
 
 func updateRepo() {
 	var (
-		out []byte
 		err error
 	)
 	boldColor("cyan", "Start updating local repository")
-	out, err = sh.Command("createrepo", tmpDir+"/"+"RPM").Output()
-	out = out[:0]
+	_, err = sh.Command("createrepo", tmpDir+"/"+"RPM").Output()
 	if err != nil {
 		boldColor("red", "Update local repository failed")
 		os.Exit(1)
@@ -205,15 +193,13 @@ func updateRepo() {
 
 func initMock() {
 	var (
-		out []byte
 		err error
 	)
 	boldColor("cyan", "Start setting up mock environment")
-	out, err = sh.Command("/usr/bin/mock",
+	_, err = sh.Command("/usr/bin/mock",
 		"-r",
 		gyml("mock_travis.mock_config"),
 		"--init").Output()
-	out = out[:0]
 	if err != nil {
 		boldColor("red", "Setup mock environment failed.")
 	}

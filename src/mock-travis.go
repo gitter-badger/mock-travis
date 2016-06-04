@@ -25,12 +25,10 @@ import (
 
 func cleanDocker(name string) {
 	var (
-		out []byte
 		err error
 	)
 	boldColor("cyan", "Start cleaning docker container...")
-	out, err = sh.Command("docker", "rm", name).Output()
-	out = out[:0]
+	_, err = sh.Command("docker", "rm", name).Output()
 	if err != nil {
 		boldColor("red", "Clean docker container failed.")
 		os.Exit(1)
@@ -40,12 +38,10 @@ func cleanDocker(name string) {
 
 func pullDocker() {
 	var (
-		out []byte
 		err error
 	)
 	boldColor("cyan", "Start pulling "+dockerImage+" docker image...")
-	out, err = sh.Command("docker", "pull", dockerImage).Output()
-	out = out[:0]
+	_, err = sh.Command("docker", "pull", dockerImage).Output()
 	if err != nil {
 		boldColor("red", "Pull "+dockerImage+" docker image failed.")
 		os.Exit(1)
